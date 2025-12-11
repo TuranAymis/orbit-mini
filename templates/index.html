@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2 class="mb-4">All Events</h2>
+
+    {% if events %}
+        <div class="row">
+            {% for e in events %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border {% if e.capacity and e.participants >= e.capacity %}border-danger bg-light text-dark{% endif %}">
+                        <div class="card-body">
+                <!-- Title and Description -->
+                            <h5 class="card-title">{{ e.title }}</h5>
+                            <p class="card-text">{{ e.description }}</p>
+
+                <!-- Date and Creator -->
+                            <p class="text-muted">{{ e.date }}</p>
+                            <p class="text-muted mb-1">Created by: <strong>{{ e.creator }}</strong></p>
+
+                <!-- Participants and Capacity -->
+                            <p class="text-muted">Participants: {{ e.participants }}</p>
+                            {% if e.capacity %}
+                                <p class="text-muted">Capacity: {{ e.capacity }}</p>
+                            {% else %}
+                                <p class="text-muted">Capacity: Unlimited</p>
+                            {% endif %}
+
+                <!-- Location -->
+                            {% if e.location_name and e.location %}
+                                <p class="text-muted mb-1">
+                                    Location:
+                                    <span class="fw-semibold">{{ e.location_name }}</span>
+                                </p>
+                            {% elif e.location %}
+                                <p class="text-muted mb-1">
+                                    Location:
+                                    <a href="{{ e.location }}" target="_blank" class="fw-semibold text-decoration-none text-primary">
+                                        View on Google Maps
+                                    </a>
+                                </p>
+                            {% endif %}
+
+
+                <!-- Buttons -->
+                            <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-2">
+                                {% if e.location %}
+                                    <a href="{{ e.location }}" target="_blank" class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                                        <span class="me-1"></span> Open in Google Maps
+                                    </a>
+                                {% else %}
+                                    <span></span>
+                                {% endif %}
+
+                                {% if e.capacity and e.participants >= e.capacity %}
+                                    <button class="btn btn-sm btn-secondary" disabled>Full</button>
+                                {% elif e.joined %}
+                                    <button class="btn btn-sm btn-success" disabled>Joined</button>
+                                {% elif session.get("user_id") %}
+                                    <a href="/join/{{ e.id }}" class="btn btn-sm btn-outline-primary">Join Event</a>
+                                {% else %}
+                                    <a href="/login" class="btn btn-sm btn-outline-primary">Login to Join</a>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No events yet. <a href="/add">Add one!</a></p>
+    {% endif %}
+{% endblock %}

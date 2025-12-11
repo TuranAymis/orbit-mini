@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="col-md-4 mx-auto">
+        <h2 class="text-center mb-3">Login</h2>
+        <form action="/login" method="post">
+            <div class="mb-3">
+                <input class="form-control" name="username" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" name="password" type="password" placeholder="Password" required>
+            </div>
+            <button class="btn btn-primary w-100">Login</button>
+        </form>
+    </div>
+{% endblock %}

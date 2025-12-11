@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="col-md-6 mx-auto">
+        <h2 class="text-center mb-3">Add Event</h2>
+
+        <form action="/add" method="post">
+        <!-- Title -->
+            <div class="mb-3">
+                <input class="form-control" name="title" placeholder="Event Title" required>
+            </div>
+
+        <!-- Date -->
+            <div class="mb-3">
+                <input class="form-control" name="date" type="date" required>
+            </div>
+
+        <!-- Capacity -->
+            <div class="mb-3">
+                <input class="form-control" name="capacity" type="number" min="1" placeholder="Capacity (optional)">
+            </div>
+
+        <!-- Description -->
+            <div class="mb-3">
+                <textarea class="form-control" name="description" rows="3" placeholder="Description (optional)"></textarea>
+            </div>
+
+        <!-- Location Name -->
+            <div class="mb-3">
+                <label for="location_name" class="form-label">Location Name</label>
+                <input type="text" name="location_name" id="location_name" class="form-control" placeholder="e.g., Mashhad İstanbul Cafe & Lounge">
+            </div>
+
+        <!-- Google Maps Link -->
+            <div class="mb-3">
+                <label for="location" class="form-label">Google Maps Link</label>
+                <input type="url" name="location" id="location" class="form-control" placeholder="Paste Google Maps URL (e.g., https://maps.app.goo.gl/...)">
+            </div>
+
+        <!-- Submit Button -->
+            <button class="btn btn-primary w-100">Save</button>
+        </form>
+    </div>
+{% endblock %}
