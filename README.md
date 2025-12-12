@@ -160,19 +160,32 @@ Environment-specific settings in `config.py`:
 
 ## 🚀 Deployment
 
+### Quick Start
+
+The project is ready for deployment to **Render**, **Railway**, or **Heroku**. See **[DEPLOYMENT.md](DEPLOYMENT.md)** for detailed instructions.
+
 ### Production Checklist
 
-1. Set `FLASK_ENV=production` in `.env`
-2. Generate a strong `SECRET_KEY`
-3. Use a production WSGI server (Gunicorn included)
-4. Consider migrating to PostgreSQL for better concurrency
-5. Enable HTTPS
+1. ✅ `.gitignore` configured (excludes `.env`, `venv/`, `__pycache__/`)
+2. ✅ `Procfile` created for production server
+3. ✅ `requirements.txt` includes all dependencies + gunicorn
+4. ✅ Environment-based configuration (debug=False in production)
+5. ✅ Database initialization handles first-run scenarios
 
-### Running with Gunicorn
+### Quick Deploy Commands
 
+**Initialize Database:**
 ```bash
-gunicorn -w 4 -b 0.0.0.0:8000 "app:create_app()"
+python init_db.py
 ```
+
+**Run with Gunicorn (Production):**
+```bash
+gunicorn "app:create_app()"
+```
+
+**Deploy to Platform:**
+- See [DEPLOYMENT.md](DEPLOYMENT.md) for platform-specific instructions
 
 ---
 
