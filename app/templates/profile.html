@@ -27,7 +27,14 @@
                     {% endif %}
                 </p>
                 <p class="text-muted mb-1">Created by: <strong>{{ e.creator }}</strong></p>
-                <p class="text-muted">Participants: {{ e.participants }}</p>
+                <p class="text-muted">
+                    Participants:
+                    <span class="text-decoration-underline cursor-pointer" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="{{ e.participant_names if e.participant_names else 'Be the first to join!' }}">
+                        {{ e.participants }}
+                    </span>
+                </p>
                 {% if e.capacity %}
                 <p class="text-muted">Capacity: {{ e.capacity }}</p>
                 {% else %}
@@ -98,7 +105,14 @@
                     {% endif %}
                 </p>
                 <p class="text-muted mb-1">Created by: <strong>{{ e.creator }}</strong></p>
-                <p class="text-muted">Participants: {{ e.participants }}</p>
+                <p class="text-muted">
+                    Participants:
+                    <span class="text-decoration-underline cursor-pointer" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="{{ e.participant_names if e.participant_names else 'Be the first to join!' }}">
+                        {{ e.participants }}
+                    </span>
+                </p>
                 {% if e.capacity %}
                 <p class="text-muted">Capacity: {{ e.capacity }}</p>
                 {% else %}

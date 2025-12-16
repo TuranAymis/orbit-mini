@@ -15,6 +15,7 @@ def index():
     query = """
         SELECT e.*,
                (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
+               (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
                u.username AS creator,
                EXISTS(SELECT 1 FROM event_participants WHERE event_id = e.id AND user_id = ?) AS joined
         FROM events e
@@ -58,6 +59,7 @@ def history():
     query = """
         SELECT e.*,
                (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
+               (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
                u.username AS creator,
                EXISTS(SELECT 1 FROM event_participants WHERE event_id = e.id AND user_id = ?) AS joined
         FROM events e
@@ -103,6 +105,7 @@ def profile():
     my_events = db.execute("""
         SELECT e.*, e.user_id AS creator_id,
                (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
+               (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
                u.username AS creator
         FROM events e
         LEFT JOIN users u ON u.id = e.user_id
@@ -114,6 +117,7 @@ def profile():
     joined = db.execute("""
         SELECT e.*, e.user_id AS creator_id,
                (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
+               (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
                u.username AS creator
         FROM events e
         JOIN event_participants ep ON e.id = ep.event_id
