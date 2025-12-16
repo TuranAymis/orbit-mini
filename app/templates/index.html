@@ -30,7 +30,7 @@
 {% if events %}
 <div class="row">
     {% for e in events %}
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6 mb-3" id="event-{{ e.id }}">
         <div
             class="card shadow-sm border {% if e.capacity and e.participants >= e.capacity %}border-danger bg-light text-dark{% endif %}">
             <div class="card-body">
@@ -53,7 +53,15 @@
                 <p class="text-muted mb-1">Created by: <strong>{{ e.creator }}</strong></p>
 
                 <!-- Participants and Capacity -->
-                <p class="text-muted">Participants: {{ e.participants }}</p>
+                <!-- Participants and Capacity -->
+                <p class="text-muted">
+                    Participants:
+                    <span class="text-decoration-underline cursor-pointer" data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        title="{{ e.participant_names if e.participant_names else 'Be the first to join!' }}">
+                        {{ e.participants }}
+                    </span>
+                </p>
                 {% if e.capacity %}
                 <p class="text-muted">Capacity: {{ e.capacity }}</p>
                 {% else %}
@@ -78,14 +86,17 @@
 
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between align-items-center mt-2 flex-wrap gap-2">
-                    {% if e.location %}
-                    <a href="{{ e.location }}" target="_blank"
-                        class="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                        <span class="me-1"></span> Open in Google Maps
-                    </a>
-                    {% else %}
-                    <span></span>
-                    {% endif %}
+                    <div class="d-flex gap-2">
+                        {% if e.location %}
+                        <a href="{{ e.location }}" target="_blank"
+                            class="btn btn-sm btn-outline-secondary d-flex align-items-center">
+                            Open in Google Maps
+                        </a>
+                        {% endif %}
+                        <button onclick="shareEvent('{{ e.id }}')" class="btn btn-sm btn-outline-info">
+                            Share 🔗
+                        </button>
+                    </div>
 
                     {% if e.capacity and e.participants >= e.capacity %}
                     <button class="btn btn-sm btn-secondary" disabled>Full</button>
@@ -104,6 +115,37 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- Toast for Share Feedback -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="shareToast" class="toast align-items-center text-white bg-success border-0" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Link copied to clipboard!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function shareEvent(eventId) {
+        // Construct URL with anchor
+        const url = window.location.origin + window.location.pathname + '#event-' + eventId;
+
+        navigator.clipboard.writeText(url).then(function () {
+            // Show toast
+            var toastEl = document.getElementById('shareToast');
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
+        }, function (err) {
+            console.error('Could not copy text: ', err);
+            alert("Failed to copy link.");
+        });
+    }
+</script>
 {% else %}
 <p>No events yet. <a href="{{ url_for('events.add') }}">Add one!</a></p>
 {% endif %}

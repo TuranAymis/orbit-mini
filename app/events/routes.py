@@ -27,9 +27,18 @@ def add():
         if not capacity:
             capacity = None
         
-        # Default category if not provided
         if not category:
             category = 'General'
+
+        # Spam Protection: Check for duplicates
+        existing_event = db.execute(
+            "SELECT id FROM events WHERE user_id = ? AND title = ? AND date = ?", 
+            session['user_id'], title, date
+        )
+        
+        if existing_event:
+            flash('This event already exists.', 'warning')
+            return render_template('events/add.html'), 409
 
         db.execute("""
             INSERT INTO events (user_id, title, date, time, category, description, capacity, location, location_name, created_at)
