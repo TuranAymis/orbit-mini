@@ -40,5 +40,25 @@ def create_app(config_name='default'):
         response.headers["Expires"] = 0
         response.headers["Pragma"] = "no-cache"
         return response
-    
+
+    # Auto-cleanup: Delete events older than 3 days
+    @app.before_request
+    def cleanup_old_events():
+        try:
+            # 1. Delete participants of expired events
+            db.execute("""
+                DELETE FROM event_participants 
+                WHERE event_id IN (
+                    SELECT id FROM events 
+                    WHERE date < DATE('now', '-3 days')
+                )
+            """)
+            
+            # 2. Delete the expired events
+            db.execute("DELETE FROM events WHERE date < DATE('now', '-3 days')")
+        except Exception as e:
+            # Log error but don't stop the request
+            print(f"Cleanup error: {e}")
+            pass
+
     return app
