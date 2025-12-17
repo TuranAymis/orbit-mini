@@ -7,45 +7,52 @@ from app import db
 @main_bp.route('/')
 def index():
     """Homepage - list all events with search and filter"""
-    userId = session.get('user_id')
-    search_query = request.args.get('search', '').strip()
-    category_filter = request.args.get('category', '').strip()
+    import sys
+    print(f"DEBUG: Entered index route. DB: {db}", file=sys.stderr)
+    try:
+        userId = session.get('user_id')
+        search_query = request.args.get('search', '').strip()
+        category_filter = request.args.get('category', '').strip()
 
-    # Base query for UPCOMING events
-    query = """
-        SELECT e.*,
-               (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
-               (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
-               u.username AS creator,
-               EXISTS(SELECT 1 FROM event_participants WHERE event_id = e.id AND user_id = ?) AS joined
-        FROM events e
-        LEFT JOIN users u ON u.id = e.user_id
-        WHERE e.date >= ?
-    """
-    
-    params = [userId, date.today()]
-    
-    # Add search filter
-    if search_query:
-        query += " AND (e.title LIKE ? OR e.description LIKE ?)"
-        search_pattern = f"%{search_query}%"
-        params.extend([search_pattern, search_pattern])
-    
-    # Add category filter
-    if category_filter and category_filter != 'All':
-        query += " AND e.category = ?"
-        params.append(category_filter)
-    
-    query += " ORDER BY datetime(e.date) ASC"
-    
-    events = db.execute(query, *params)
-    
-    # Get unique categories for filter dropdown
-    categories = db.execute("SELECT DISTINCT category FROM events WHERE category IS NOT NULL ORDER BY category")
-    category_list = [cat['category'] for cat in categories if cat['category']]
+        # Base query for UPCOMING events
+        query = """
+            SELECT e.*,
+                   (SELECT COUNT(*) FROM event_participants WHERE event_id = e.id) AS participants,
+                   (SELECT GROUP_CONCAT(u2.username, ', ') FROM event_participants ep2 JOIN users u2 ON ep2.user_id = u2.id WHERE ep2.event_id = e.id) AS participant_names,
+                   u.username AS creator,
+                   EXISTS(SELECT 1 FROM event_participants WHERE event_id = e.id AND user_id = ?) AS joined
+            FROM events e
+            LEFT JOIN users u ON u.id = e.user_id
+            WHERE e.date >= ?
+        """
+        
+        params = [userId, str(date.today())]
+        
+        # Add search filter
+        if search_query:
+            query += " AND (e.title LIKE ? OR e.description LIKE ?)"
+            search_pattern = f"%{search_query}%"
+            params.extend([search_pattern, search_pattern])
+        
+        # Add category filter
+        if category_filter and category_filter != 'All':
+            query += " AND e.category = ?"
+            params.append(category_filter)
+        
+        query += " ORDER BY e.date ASC"
+        
+        events = db.execute(query, *params)
+        
+        # Get unique categories for filter dropdown
+        categories = db.execute("SELECT DISTINCT category FROM events WHERE category IS NOT NULL ORDER BY category")
+        category_list = [cat['category'] for cat in categories if cat['category']]
 
-    return render_template('index.html', events=events, categories=category_list, 
-                         search_query=search_query, selected_category=category_filter)
+        return render_template('index.html', events=events, categories=category_list, 
+                             search_query=search_query, selected_category=category_filter)
+    except Exception as e:
+        import traceback
+        traceback.print_exc(file=sys.stderr)
+        return str(e), 500
 
 
 @main_bp.route('/history')
@@ -67,7 +74,7 @@ def history():
         WHERE e.date < ?
     """
     
-    params = [userId, date.today()]
+    params = [userId, str(date.today())]
     
     # Add search filter
     if search_query:
@@ -81,7 +88,7 @@ def history():
         params.append(category_filter)
     
     # Sort DESCENDING by date (newest past event first)
-    query += " ORDER BY datetime(e.date) DESC"
+    query += " ORDER BY e.date DESC"
     
     events = db.execute(query, *params)
     
@@ -110,7 +117,7 @@ def profile():
         FROM events e
         LEFT JOIN users u ON u.id = e.user_id
         WHERE e.user_id = ?
-        ORDER BY datetime(e.date) ASC
+        ORDER BY e.date ASC
     """, userId)
 
     # Events the user has joined (created by others)
@@ -123,7 +130,7 @@ def profile():
         JOIN event_participants ep ON e.id = ep.event_id
         LEFT JOIN users u ON u.id = e.user_id
         WHERE ep.user_id = ?
-        ORDER BY datetime(e.date) ASC
+        ORDER BY e.date ASC
     """, userId)
 
     return render_template('profile.html', events=my_events, joined=joined)
