@@ -180,6 +180,15 @@ h2 {
     transform: translateY(-2px);
 }
 
+/* === TOUCH TARGETS & SCROLL === */
+.touch-target {
+    min-height: 44px;
+}
+
+body {
+    overflow-x: hidden;
+}
+
 .btn-modern.btn-outline-secondary {
     background: transparent;
     color: var(--text-secondary);

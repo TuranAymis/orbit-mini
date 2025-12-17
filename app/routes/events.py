@@ -34,7 +34,13 @@ def add():
         flash(message, 'success')
         return redirect(url_for('main.index'))
         
-    return render_template('events/add.html', form=form)
+        flash(message, 'success')
+        return redirect(url_for('main.index'))
+        
+    from datetime import date, timedelta
+    today_date = date.today().isoformat()
+    max_date = (date.today() + timedelta(days=730)).isoformat()
+    return render_template('events/add.html', form=form, today_date=today_date, max_date=max_date)
 
 
 @events_bp.route('/detail/<int:event_id>', methods=['GET', 'POST'])
