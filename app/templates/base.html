@@ -60,16 +60,126 @@
         {% block content %}{% endblock %}
     </div>
 
+
+    <!-- Generic Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-0 relative" id="eventModalBody">
+                    <!-- Content injected via AJAX -->
+                    <div class="d-flex justify-content-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS for alert -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Initialize Tooltips -->
+    <!-- Custom Logic -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // 1. Tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             })
+
+            // 2. Modal AJAX Logic
+            const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
+            const modalBody = document.getElementById('eventModalBody');
+
+            // Open Modal
+            document.querySelectorAll('.open-event-modal').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.getAttribute('href');
+
+                    // Show modal with loading state
+                    modalBody.innerHTML = `
+                        <div class="d-flex justify-content-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>`;
+                    eventModal.show();
+
+                    fetchContent(url);
+                });
+            });
+
+            // Generic Fetch Function
+            function fetchContent(url, method = 'GET', body = null) {
+                const options = {
+                    method: method,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                };
+                if (body) {
+                    options.body = body;
+                }
+
+                fetch(url, options)
+                    .then(response => response.text())
+                    .then(html => {
+                        modalBody.innerHTML = html;
+                        attachModalListeners(); // Re-attach listeners to new content
+
+                        // Re-initialize tooltips inside modal if any
+                        // ...
+                    })
+                    .catch(err => {
+                        modalBody.innerHTML = `<div class="alert alert-danger">Error loading content.</div>`;
+                    });
+            }
+
+            // Attach listeners to dynamic content inside modal
+            function attachModalListeners() {
+                // 1. Handle "Join/Leave" links
+                modalBody.querySelectorAll('.ajax-action').forEach(btn => {
+                    btn.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const url = this.getAttribute('href');
+
+                        // Show visible feedback (e.g., disable button or opacity)
+                        modalBody.style.opacity = '0.5';
+
+                        fetchContent(url);
+
+                        // Restore opacity is handled by the fetchContent updating the HTML, 
+                        // effectively resetting the view. Alternatively we could do it in .then()
+                        // but updating the HTML completely is safer for consistency.
+                        setTimeout(() => { modalBody.style.opacity = '1'; }, 200);
+                    });
+                });
+
+                // 2. Handle Comment Form
+                const form = modalBody.querySelector('form.ajax-form');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
+                        const formData = new FormData(this);
+                        const url = this.action;
+
+                        // Disable button
+                        const btn = this.querySelector('button[type="submit"]');
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.innerHTML = 'Posting...';
+                        }
+
+                        fetchContent(url, 'POST', formData);
+                    });
+                }
+            }
         });
     </script>
 

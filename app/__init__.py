@@ -19,6 +19,8 @@ def create_app(config_name='default'):
     # Initialize extensions
     session_manager.init_app(app)
     db.init_app(app)
+    from flask_wtf.csrf import CSRFProtect
+    csrf = CSRFProtect(app)
     
     # Register blueprints
     from app.routes.auth import auth_bp

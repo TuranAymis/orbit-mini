@@ -28,11 +28,13 @@ class Event(db.Model):
     capacity = db.Column(db.Integer)
     location = db.Column(db.String)
     location_name = db.Column(db.String)
+    image_url = db.Column(db.String)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     # Relationships
     creator = db.relationship('User', back_populates='events')
     participants = db.relationship('EventParticipant', back_populates='event', lazy='dynamic', cascade="all, delete-orphan")
+    comments = db.relationship('Comment', back_populates='event', lazy=True, cascade="all, delete-orphan")
 
     @property
     def participants_count(self):
@@ -60,7 +62,8 @@ class Event(db.Model):
             'title': self.title,
             'date': self.date,
             'description': self.description,
-            'category': self.category
+            'category': self.category,
+            'image_url': self.image_url
         }
 
 
@@ -74,3 +77,20 @@ class EventParticipant(db.Model):
     # Relationships
     user = db.relationship('User', back_populates='joined_events')
     event = db.relationship('Event', back_populates='participants')
+
+
+class Comment(db.Model):
+    __tablename__ = 'comments'
+
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.id'), nullable=False)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    # Relationships
+    user = db.relationship('User', back_populates='comments')
+    event = db.relationship('Event', back_populates='comments')
+
+# Update User relationship for comments (can be done by adding property here to User or simpler, just backref)
+User.comments = db.relationship('Comment', back_populates='user', lazy=True)

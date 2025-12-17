@@ -33,12 +33,35 @@ class EventService:
             description=event_data.get('description'),
             capacity=capacity,
             location=event_data.get('location'),
-            location_name=event_data.get('location_name')
+            location_name=event_data.get('location_name'),
+            image_url=event_data.get('image_url')
         )
         
         db.session.add(new_event)
         db.session.commit()
         return new_event, "Event created successfully"
+
+    @staticmethod
+    def add_comment(user_id, event_id, content):
+        """Adds a comment to an event"""
+        from app.models.models import Comment
+        if not content:
+            return False, "Content cannot be empty"
+
+        new_comment = Comment(
+            user_id=user_id,
+            event_id=event_id,
+            content=content
+        )
+        db.session.add(new_comment)
+        db.session.commit()
+        return new_comment, "Comment added successfully"
+
+    @staticmethod
+    def get_comments(event_id):
+        """Get comments for an event"""
+        from app.models.models import Comment
+        return Comment.query.filter_by(event_id=event_id).order_by(Comment.created_at.desc()).all()
 
     @staticmethod
     def get_event_with_details(event_id, current_user_id=None):
