@@ -49,7 +49,7 @@
                     <span class="ms-2">🕐 {{ e.time }}</span>
                     {% endif %}
                 </p>
-                <p class="text-muted mb-1">Created by: <strong>{{ e.creator }}</strong></p>
+                <p class="text-muted mb-1">Created by: <strong>{{ e.creator_username }}</strong></p>
 
                 <!-- Participants and Capacity -->
                 <!-- Participants and Capacity -->
@@ -57,7 +57,7 @@
                     Participants:
                     <span class="text-decoration-underline cursor-pointer" data-bs-toggle="tooltip"
                         data-bs-placement="top" title="{{ e.participant_names if e.participant_names else 'None' }}">
-                        {{ e.participants }}
+                        {{ e.participants_count }}
                     </span>
                 </p>
 
