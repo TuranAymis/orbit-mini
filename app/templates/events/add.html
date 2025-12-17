@@ -4,24 +4,26 @@
 <div class="col-md-6 mx-auto">
     <h2 class="text-center mb-3">Add Event</h2>
 
-    <form action="{{ url_for('events.add') }}" method="post">
+    <form action="{{ url_for('events.add') }}" method="post" class="needs-validation" novalidate>
         {{ form.hidden_tag() }}
 
         <!-- Title -->
         <div class="mb-3">
-            {{ form.title.label(class="form-label") }}
-            {{ form.title(class="form-control", placeholder="Event Title") }}
+            {{ form.title.label(class="form-label") }} <span class="text-danger">*</span>
+            {{ form.title(class="form-control" + (" is-invalid" if form.title.errors else ""), placeholder="Event
+            Title", maxlength="100") }}
             {% for error in form.title.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Date -->
         <div class="mb-3">
-            {{ form.date.label(class="form-label") }}
-            {{ form.date(class="form-control", type="date") }}
+            {{ form.date.label(class="form-label") }} <span class="text-danger">*</span>
+            {{ form.date(class="form-control" + (" is-invalid" if form.date.errors else ""), type="date",
+            min=today_date, max=max_date) }}
             {% for error in form.date.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>
 
@@ -40,44 +42,50 @@
         <!-- Capacity -->
         <div class="mb-3">
             {{ form.capacity.label(class="form-label") }}
-            {{ form.capacity(class="form-control", placeholder="Capacity (optional)") }}
+            {{ form.capacity(class="form-control" + (" is-invalid" if form.capacity.errors else ""),
+            placeholder="Capacity (optional)", min="1") }}
             {% for error in form.capacity.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Description -->
         <div class="mb-3">
             {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control", rows="3", placeholder="Description (optional)") }}
+            {{ form.description(class="form-control", rows="3", placeholder="Description (optional)", maxlength="500")
+            }}
         </div>
 
         <!-- Location Name -->
         <div class="mb-3">
             {{ form.location_name.label(class="form-label") }}
-            {{ form.location_name(class="form-control", placeholder="e.g., Mashhad İstanbul Cafe & Lounge") }}
+            {{ form.location_name(class="form-control", placeholder="e.g., Mashhad İstanbul Cafe & Lounge",
+            maxlength="100") }}
         </div>
 
         <!-- Google Maps Link -->
         <div class="mb-3">
             {{ form.location.label(class="form-label") }}
-            {{ form.location(class="form-control", placeholder="Paste Google Maps URL") }}
+            {{ form.location(class="form-control" + (" is-invalid" if form.location.errors else ""), placeholder="Paste
+            Google Maps URL") }}
             {% for error in form.location.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
+            <div class="form-text">Must be a valid Google Maps link.</div>
         </div>
 
         <!-- Image URL -->
         <div class="mb-3">
             {{ form.image_url.label(class="form-label") }}
-            {{ form.image_url(class="form-control", placeholder="Image URL (optional)") }}
+            {{ form.image_url(class="form-control" + (" is-invalid" if form.image_url.errors else ""),
+            placeholder="Image URL (optional)", maxlength="500") }}
             {% for error in form.image_url.errors %}
-            <div class="text-danger small">{{ error }}</div>
+            <div class="invalid-feedback">{{ error }}</div>
             {% endfor %}
         </div>
 
         <!-- Submit Button -->
-        {{ form.submit(class="btn btn-modern btn-primary w-100") }}
+        {{ form.submit(class="btn btn-modern btn-primary w-100 touch-target") }}
     </form>
 </div>
 {% endblock %}
