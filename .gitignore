@@ -42,7 +42,7 @@ flask_session/
 # Database
 *.sqlite
 *.sqlite3
-!orbit.db  # <--- KRİTİK EKLEME: Bu dosya artık GitHub'a yüklenecek
+*.db
 
 # OS
 .DS_Store
